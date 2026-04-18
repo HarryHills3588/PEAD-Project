@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from requests import get
 import  datetime as dt
+from utils.dbconnection import DBConnection
 
 class DataLoader():
     def __init__(self) -> None:
@@ -15,6 +16,7 @@ class DataLoader():
         }
         
         self.apikey = os.getenv('FIN_DS_KEY')
+        self.client = DBConnection().get_sb_client()
 
     def get_data(self, endpoint:str, ticker:str, interval:str = 'day'):
         if endpoint in self.endpoints.keys() and self.apikey:
@@ -34,3 +36,10 @@ class DataLoader():
             response = get(request_url,headers=header)
             
             return response.json()
+        
+    def ingest_raw_data(self):
+        
+        
+        
+    def db_insert_df(self):
+        
