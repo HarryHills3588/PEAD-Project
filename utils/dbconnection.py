@@ -2,6 +2,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import os 
 from sqlalchemy import create_engine, text
+from pathlib import Path
 
 load_dotenv()
 
@@ -10,6 +11,10 @@ class DBConnection():
         supabase_url = os.getenv('SUPABASE_URL')
         supabase_pass = os.getenv('SUPABASE_KEY')
         conn_str = os.getenv('DB_CONN_STR')
+        
+        ing_path = os.getenv('ING_SCRPT_PTH')
+        if ing_path:
+            self.ingestion_script_path = Path(ing_path)
         
         if supabase_url and supabase_pass:
             self.client: Client = create_client(supabase_url=supabase_url, supabase_key=supabase_pass)
@@ -32,8 +37,9 @@ class DBConnection():
         
     def execute_sql_file(self, filename:str):
         client = self.get_script_client()
+        filepath = self.ingestion_script_path.joinpath(filename)
         
-        with open(filename, 'r') as file:
+        with open(filepath, 'r') as file:
             query = file.read()
         
         if client:
