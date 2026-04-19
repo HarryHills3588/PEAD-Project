@@ -10,15 +10,18 @@ from supabase import Client
 
 class DataLoader():
     def __init__(self) -> None:
-        self.endpoints = {
-            'earnings': "https://api.financialdatasets.ai/earnings",
-            'prices': "https://api.financialdatasets.ai/prices",
-            'facts':  "https://api.financialdatasets.ai/company/facts"
-        }
-        
         self.db_conn = DBConnection()
         self.apikey = os.getenv('FIN_DS_KEY')
         self.client = self.db_conn.get_sb_client()
+        self.fmp_key = os.getenv('FMP_KEY')
+        
+        self.endpoints = {
+            'earnings': "https://api.financialdatasets.ai/earnings",
+            'prices': "https://api.financialdatasets.ai/prices",
+            'facts':  "https://api.financialdatasets.ai/company/facts",
+            'fmp_earnings': "https://financialmodelingprep.com/stable/earnings?symbol=AAPL&apikey={self.fmp_key}"
+        }
+        
 
     def get_data(self, endpoint:str, ticker:str, interval:str = 'day'):
         if endpoint in self.endpoints.keys() and self.apikey:
@@ -34,8 +37,14 @@ class DataLoader():
                 
                 
                 request_url += f'&interval={interval}' + f'&start_date={start_date_str}' + f'&end_date={end_date_str}'
-            
-            response = get(request_url,headers=header)
+                response = get(request_url,headers=header)
+                
+            elif endpoint == 'fmp_earnings':
+                request_url = self.endpoints[endpoint]
+                response = get(request_url)
+                
+            else:
+                response = get(request_url,headers=header)
             
             return response.json()
         
@@ -78,12 +87,16 @@ class DataLoader():
         self.db_conn.execute_sql_file('create_earnings_tbl.sql')
         self.db_conn.execute_sql_file('create_facts_tbl.sql')
         self.db_conn.execute_sql_file('create_prices_tbl.sql')
+        self.db_conn.execute_sql_file('create_fmp_earnings_tbl.sql')
         
         # Populate these tables
         earnings = self.get_data('earnings',ticker)['earnings']
         prices = self.get_data('prices',ticker)['prices']
         facts = self.get_data('facts', ticker)['company_facts']
         
+        fmp_table = self.get_data('fmp_earnings', ticker)
+        
+        self.db_insert_df('fmp_earnings', pd.DataFrame(fmp_table))
         self.db_insert_df('prices', pd.DataFrame(prices))
         
         if isinstance(self.client, Client):

@@ -6,3 +6,9 @@ sources:
       - name: earnings
       - name: facts
       - name: prices
+
+  - name: fmp
+    database: postgres
+    schema: raw
+    tables:
+      - name: fmp_earnings
