@@ -1,0 +1,20 @@
+WITH sectors AS (
+    SELECT * FROM {{  ref('sectors')  }}
+),
+exchanges AS (
+    SELECT * FROM {{ ref('exchanges')  }}
+),
+locations AS (
+    SELECT * FROM {{ ref('locations')  }}
+)
+
+SELECT 
+    f.ticker,
+    f.name,
+    s.sector_id,
+    e.exchange_id,
+    l.location_id
+FROM {{  ref('process_facts')  }} f
+JOIN sectors s USING (sector)
+JOIN exchanges e USING (exchange)
+JOIN locations l USING ("location")

@@ -18,4 +18,15 @@ casted AS (
         AND "revenueActual" IS NOT NULL
 )
 
-SELECT *, EXTRACT(QUARTER FROM "date") AS "quarter" FROM casted
+SELECT 
+    *, 
+    EXTRACT(QUARTER FROM "date") AS "quarter",
+    ("epsActual" - "epsEstimated")::numeric(10,4) AS surprise,
+    CASE
+        WHEN "epsEstimated" = 0 THEN NULL
+        WHEN ("epsActual" - "epsEstimated") / ABS("epsEstimated") * 100 > 1.0 THEN 'BEAT'
+        WHEN ("epsActual" - "epsEstimated") / ABS("epsEstimated") * 100 < -1.0 THEN 'MISS'
+        ELSE 'MEET'
+    END::TEXT AS surprise_label,
+    EXTRACT(YEAR FROM "date")::int || '-Q'|| EXTRACT(QUARTER FROM "date")::int AS fiscal_period
+FROM casted
