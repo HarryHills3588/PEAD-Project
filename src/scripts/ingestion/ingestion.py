@@ -1,7 +1,7 @@
 from src.scripts.ingestion.data_loader import DataLoader
 
 ticker_list = [
-    
+    'NVDA'
 ]
 
 data_loader = DataLoader()

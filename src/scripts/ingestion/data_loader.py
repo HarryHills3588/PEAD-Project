@@ -48,8 +48,12 @@ class DataLoader():
     def process_earnings(self, earnings:dict):
         out_dict = {
             'ticker': earnings['ticker'],
-            'fiscal_period': earnings['fiscal_period']
         }
+        
+        try:
+            out_dict['fiscal_period'] = earnings['fiscal_period']
+        except KeyError as e:
+            print('No fiscal period in main dict')
         
         for key in earnings['quarterly'].keys():
             out_dict[key] = earnings['quarterly'][key]
