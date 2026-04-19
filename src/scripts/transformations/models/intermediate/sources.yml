@@ -3,7 +3,6 @@ sources:
     database: postgres
     schema: raw
     tables:
-      - name: earnings
       - name: facts
       - name: prices
 
