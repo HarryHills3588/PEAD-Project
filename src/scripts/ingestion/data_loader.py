@@ -8,6 +8,7 @@ import  datetime as dt
 from utils.dbconnection import DBConnection
 from supabase import Client
 from dotenv import load_dotenv
+import datetime as dt
 
 class DataLoader():
     def __init__(self) -> None:
@@ -25,18 +26,16 @@ class DataLoader():
         }
         
 
-    def get_data(self, endpoint:str, ticker:str, interval:str = 'day'):
+    def get_data(self, endpoint:str, ticker:str, interval:str = 'day', end_date:dt.datetime = dt.datetime.now()):
+        start_date:dt.datetime = end_date - dt.timedelta(30)
+        
         if endpoint in self.endpoints.keys() and self.apikey:
             request_url = self.endpoints[endpoint] + f'?ticker={ticker}'
             header = {"X-API-KEY": self.apikey}
             
             if endpoint == 'prices':
-                end_date = dt.datetime.now()
-                start_date = end_date - dt.timedelta(days=30)
-                
                 start_date_str = start_date.strftime("%Y-%m-%d")
                 end_date_str = end_date.strftime("%Y-%m-%d")
-                
                 
                 request_url += f'&interval={interval}' + f'&start_date={start_date_str}' + f'&end_date={end_date_str}'
                 response = get(request_url,headers=header)
@@ -87,7 +86,7 @@ class DataLoader():
         
         return out_dict
         
-    def ingest_raw_data(self, ticker:str):
+    def ingest_raw_data(self, ticker:str, end_date:dt.datetime = dt.datetime.now()):
         # Initialize the tables and raw schema if they dont exist
         self.db_conn.execute_sql_file('create_raw_schema.sql')
         self.db_conn.execute_sql_file('create_facts_tbl.sql')
@@ -95,7 +94,7 @@ class DataLoader():
         self.db_conn.execute_sql_file('create_fmp_earnings_tbl.sql')
         
         # Populate these tables
-        prices = self.get_data('prices',ticker)['prices']
+        prices = self.get_data('prices',ticker, end_date=end_date)['prices']
         facts = self.get_data('facts', ticker)['company_facts']
         
         fmp_table = self.get_data('fmp_earnings', ticker)

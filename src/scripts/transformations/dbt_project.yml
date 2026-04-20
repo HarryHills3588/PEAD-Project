@@ -34,11 +34,15 @@ models:
     # Config indicated by + and applies to all files under models/example/
     intermediate:
       +materialized: view
+      +schema: staging
 
       process_individually:
         +materialized: view
+        +schema: staging
 
-    data_warehosue:
+    data_warehouse:
       +materialized: table
+      +schema: warehouse
     gold:
       +materialized: table
+      +schema: gold
