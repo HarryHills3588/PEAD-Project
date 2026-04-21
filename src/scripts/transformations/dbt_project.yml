@@ -41,7 +41,8 @@ models:
         +schema: staging
 
     data_warehouse:
-      +materialized: table
+      +materialized: incremental
+      +incremental_strategy: merge
       +schema: warehouse
     gold:
       +materialized: table

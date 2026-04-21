@@ -11,3 +11,5 @@ SELECT
     "volume"::integer,
     "time"::date
 FROM deduplicated
+
+-- TODO: Look at prices and make sure they have {{ config }} for incrementable 

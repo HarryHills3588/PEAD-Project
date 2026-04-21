@@ -7,7 +7,7 @@ quarters AS (
 
 SELECT 
     e.ticker,
-    q.fiscal_period,
+    q.quarter_id,
     e."epsActual",
     e."epsEstimated",
     e.surprise,

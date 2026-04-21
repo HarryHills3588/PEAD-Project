@@ -1,0 +1,1 @@
+TRUNCATE raw.prices, raw.fmp_earnings, raw.facts CASCADE;

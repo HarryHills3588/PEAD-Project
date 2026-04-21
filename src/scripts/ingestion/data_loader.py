@@ -20,9 +20,9 @@ class DataLoader():
         
         self.endpoints = {
             'earnings': "https://api.financialdatasets.ai/earnings",
-            'prices': "https://api.financialdatasets.ai/prices",
+            'prices': "https://financialmodelingprep.com/stable/historical-price-eod/full?symbol={ticker}&from={from_date}&to={to}&apikey={fmp_key}",
             'facts':  "https://api.financialdatasets.ai/company/facts",
-            'fmp_earnings': f"https://financialmodelingprep.com/stable/earnings?symbol=AAPL&apikey={self.fmp_key}"
+            'fmp_earnings': "https://financialmodelingprep.com/stable/earnings?symbol={ticker}&apikey={fmp_key}"
         }
         
 
@@ -37,11 +37,18 @@ class DataLoader():
                 start_date_str = start_date.strftime("%Y-%m-%d")
                 end_date_str = end_date.strftime("%Y-%m-%d")
                 
-                request_url += f'&interval={interval}' + f'&start_date={start_date_str}' + f'&end_date={end_date_str}'
-                response = get(request_url,headers=header)
+                request_url = self.endpoints[endpoint].format(
+                    ticker = ticker, 
+                    from_date = start_date_str,
+                    to = end_date_str,
+                    fmp_key = self.fmp_key
+                )
+                
+                ### TODO: see if has the same columns if not same format, format through pd.DF and convert back to json
+                response = get(request_url)
                 
             elif endpoint == 'fmp_earnings':
-                request_url = self.endpoints[endpoint]
+                request_url = self.endpoints[endpoint].format(ticker=ticker, fmp_key=self.fmp_key)
                 response = get(request_url)
                 
             else:
@@ -94,7 +101,7 @@ class DataLoader():
         self.db_conn.execute_sql_file('create_fmp_earnings_tbl.sql')
         
         # Populate these tables
-        prices = self.get_data('prices',ticker, end_date=end_date)['prices']
+        prices = self.get_data('prices',ticker, end_date=end_date)['prices'] #TODO: LOOK AT [PRICES KEY]
         facts = self.get_data('facts', ticker)['company_facts']
         
         fmp_table = self.get_data('fmp_earnings', ticker)
