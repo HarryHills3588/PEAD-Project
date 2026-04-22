@@ -8,8 +8,9 @@ SELECT
     "close"::numeric(10,2),
     "high"::numeric(10,2),
     "low"::numeric(10,2),
-    "volume"::integer,
-    "time"::date
+    "volume"::bigint,
+    "time"::date,
+    current_timestamp as created_at
 FROM deduplicated
 
 -- TODO: Look at prices and make sure they have {{ config }} for incrementable 

@@ -27,7 +27,7 @@ class DataLoader():
         
 
     def get_data(self, endpoint:str, ticker:str, interval:str = 'day', end_date:dt.datetime = dt.datetime.now()):
-        start_date:dt.datetime = end_date - dt.timedelta(30)
+        start_date:dt.datetime = end_date - dt.timedelta(days=2*365)
         
         if endpoint in self.endpoints.keys() and self.apikey:
             request_url = self.endpoints[endpoint] + f'?ticker={ticker}'
@@ -44,7 +44,6 @@ class DataLoader():
                     fmp_key = self.fmp_key
                 )
                 
-                ### TODO: see if has the same columns if not same format, format through pd.DF and convert back to json
                 response = get(request_url)
                 
             elif endpoint == 'fmp_earnings':
@@ -101,15 +100,24 @@ class DataLoader():
         self.db_conn.execute_sql_file('create_fmp_earnings_tbl.sql')
         
         # Populate these tables
-        prices = self.get_data('prices',ticker, end_date=end_date)['prices'] #TODO: LOOK AT [PRICES KEY]
-        facts = self.get_data('facts', ticker)['company_facts']
+        prices = self.get_data('prices',ticker, end_date=end_date)
         
-        fmp_table = self.get_data('fmp_earnings', ticker)
-        
-        self.db_insert_df('fmp_earnings', pd.DataFrame(fmp_table))
-        self.db_insert_df('prices', pd.DataFrame(prices))
+        if prices:
+            self.db_insert_df('prices', pd.DataFrame(prices).rename(columns={'symbol':'ticker', 'date':'time'}).drop(columns=['change','changePercent','vwap']))
         
         if isinstance(self.client, Client):
-            facts_dict = self.process_facts(facts)
-            
-            self.client.schema('raw').table('facts').insert(facts_dict).execute()
+            existing = (
+                self.client.schema('raw')
+                    .table('facts')
+                    .select('ticker')
+                    .eq('ticker', ticker)
+                    .execute()
+            )
+
+            if not existing.data:
+                facts = self.get_data('facts', ticker)['company_facts']
+                facts_dict = self.process_facts(facts)
+                self.client.schema('raw').table('facts').insert(facts_dict).execute()
+
+                fmp_table = self.get_data('fmp_earnings', ticker)
+                self.db_insert_df('fmp_earnings', pd.DataFrame(fmp_table))

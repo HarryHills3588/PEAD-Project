@@ -28,5 +28,6 @@ SELECT
         WHEN ("epsActual" - "epsEstimated") / ABS("epsEstimated") * 100 < -1.0 THEN 'MISS'
         ELSE 'MEET'
     END::TEXT AS surprise_label,
-    EXTRACT(YEAR FROM "date")::int || '-Q'|| EXTRACT(QUARTER FROM "date")::int AS fiscal_period
+    EXTRACT(YEAR FROM "date")::int || '-Q'|| EXTRACT(QUARTER FROM "date")::int AS fiscal_period,
+    current_timestamp  as created_at
 FROM casted

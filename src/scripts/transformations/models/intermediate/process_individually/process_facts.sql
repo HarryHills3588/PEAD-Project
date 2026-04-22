@@ -8,5 +8,6 @@ SELECT
     sector::varchar(90),
     industry::varchar(45),
     exchange::varchar(45),
-    "location"::varchar(45)
+    "location"::varchar(45),
+    current_timestamp  as created_at
 FROM deduplicated

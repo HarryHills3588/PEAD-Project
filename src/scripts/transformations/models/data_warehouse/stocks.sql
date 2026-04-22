@@ -1,3 +1,9 @@
+{{
+    config(
+        unique_key='ticker'
+    )
+}}
+
 WITH sectors AS (
     SELECT * FROM {{  ref('sectors')  }}
 ),
@@ -13,8 +19,13 @@ SELECT
     f.name,
     s.sector_id,
     e.exchange_id,
-    l.location_id
+    l.location_id,
+    f.created_at
 FROM {{  ref('process_facts')  }} f
 JOIN sectors s USING (sector)
 JOIN exchanges e USING (exchange)
 JOIN locations l USING ("location")
+
+{% if is_incremental() %}
+    WHERE f.created_at > (SELECT max(created_at) FROM {{ this }})
+{% endif %}
