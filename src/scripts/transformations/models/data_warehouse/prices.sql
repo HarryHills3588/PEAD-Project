@@ -17,5 +17,5 @@ FROM {{  ref('process_prices')  }}
 WHERE "close" IS NOT NULL and ticker IS NOT NULL
 
 {% if is_incremental() %}
-    AND created_at > (SELECT max(created_at) FROM {{ this }})
+    AND created_at > (SELECT COALESCE(max(created_at), '1900-01-01') FROM {{ this }})
 {% endif %}

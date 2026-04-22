@@ -25,7 +25,7 @@ joined AS (
     JOIN surprise_labels sl USING (surprise_label)
 
     {% if is_incremental() %}
-        WHERE q.created_at > (SELECT max(created_at) FROM {{ this }})
+        WHERE q.created_at > (SELECT COALESCE(max(created_at), '1900-01-01') FROM {{ this }})
     {% endif %}
 )
 

@@ -27,5 +27,5 @@ JOIN exchanges e USING (exchange)
 JOIN locations l USING ("location")
 
 {% if is_incremental() %}
-    WHERE f.created_at > (SELECT max(created_at) FROM {{ this }})
+    WHERE f.created_at > (SELECT COALESCE(max(created_at), '1900-01-01') FROM {{ this }})
 {% endif %}
