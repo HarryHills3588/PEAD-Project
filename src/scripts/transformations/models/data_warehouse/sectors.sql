@@ -18,5 +18,5 @@ SELECT
 FROM sectors
 
 {% if is_incremental() %}
-    WHERE created_at > (SELECT max(created_at) FROM {{ this }})
+    WHERE created_at > (SELECT COALESCE(max(created_at), '1900-01-01') FROM {{ this }})
 {% endif %}
