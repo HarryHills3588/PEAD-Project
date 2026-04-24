@@ -43,7 +43,7 @@ with DAG(
     
     transformation_task = BashOperator(
         task_id='Transformation',
-        bash_command='cd "/Users/harryhillsdownley/Desktop/CWRU/CSDS 397/PEAD Project/src/scripts/transformations" && dbt run',
+        bash_command='cd "/Users/harryhillsdownley/Desktop/CWRU/CSDS 397/PEAD Project/src/scripts/transformations" && dbt run --select +path:models/data_warehouse',
     )
     
     cleanup_task = PythonOperator(
@@ -51,4 +51,9 @@ with DAG(
         python_callable=clean_ingestion_schema,
     )
     
-    ingestion_task >> transformation_task >> cleanup_task
+    compute_analytics = BashOperator(
+        task_id='compute_analytics',
+        bash_command='cd "/Users/harryhillsdownley/Desktop/CWRU/CSDS 397/PEAD Project/src/scripts/transformations" && dbt run --select path:models/data_warehouse+'
+    )
+    
+    ingestion_task >> transformation_task >> cleanup_task >> compute_analytics

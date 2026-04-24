@@ -95,6 +95,7 @@ class DataLoader():
     def ingest_raw_data(self, ticker:str, end_date:dt.datetime = dt.datetime.now()):
         # Initialize the tables and raw schema if they dont exist
         self.db_conn.execute_sql_file('create_raw_schema.sql')
+        self.db_conn.execute_sql_file('raw_permissions.sql')
         self.db_conn.execute_sql_file('create_facts_tbl.sql')
         self.db_conn.execute_sql_file('create_prices_tbl.sql')
         self.db_conn.execute_sql_file('create_fmp_earnings_tbl.sql')

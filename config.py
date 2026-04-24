@@ -1,6 +1,9 @@
 ticker_list = [
+    # Market
+    "SPY",
+    
     # Big Tech & Semis
-    "AAPL", "MSFT", "NVDA", "GOOGL", "META", "AMZN", "AMD", "ADBE", "INTC", 
+    "AAPL", "MSFT", "NVDA", "GOOGL", "META", "AMZN", "AMD", "ADBE", # "INTC", 
     
     # Software & SaaS
     "SHOP", "PLTR", "DOCU", "ZM", "ROKU", 

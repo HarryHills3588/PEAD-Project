@@ -32,6 +32,7 @@ joined AS (
 SELECT DISTINCT ON (ticker, quarter_id)
     ticker,
     quarter_id,
+    "date",
     "epsActual",
     "epsEstimated",
     surprise,
