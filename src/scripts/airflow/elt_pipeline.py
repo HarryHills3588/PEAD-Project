@@ -28,15 +28,15 @@ def clean_ingestion_schema():
     
 
 with DAG(
-    dag_id='Data_loading_backfill_DB',
+    dag_id='elt_pipeline_PEAD',
     start_date=datetime(2015,4,20),
-    schedule=timedelta(days=548),
+    schedule='0 0 13,28 * *',
     max_active_runs=1,
     catchup=True
     ):
     
     ingestion_task = PythonOperator(
-        task_id='test_for_python_context',
+        task_id='api_ingestion',
         python_callable=run_ingestion_task,
         retries = 0
     )
