@@ -18,7 +18,7 @@ WITH all_events AS (
         sb.car_7d,
         sb.car_30d,
         sb.abs_car_7d
-    FROM {{ ref('stg_surprise_buckets') }} sb
+    FROM {{ ref('surprise_buckets') }} sb
 ),
 
 with_pairs AS (
@@ -39,7 +39,7 @@ with_pairs AS (
             ELSE FALSE
         END AS has_matched_pair
     FROM all_events ae
-    LEFT JOIN {{ ref('stg_matched_pairs') }} mp
+    LEFT JOIN {{ ref('matched_pairs') }} mp
         ON  mp.ticker = ae.ticker
         AND mp.miss_quarter_id = ae.quarter_id
 ),
